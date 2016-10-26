@@ -1,6 +1,6 @@
 // This is sourced from https://github.com/toorop/go-dkim/blob/master/pubKeyRep.go
 
-package dnssign
+package dkimcrypt
 
 import (
 	"crypto/rsa"

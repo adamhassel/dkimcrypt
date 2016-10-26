@@ -1,4 +1,4 @@
-package dnssign
+package dkimcrypt
 
 import (
 	"crypto"
