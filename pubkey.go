@@ -10,27 +10,6 @@ import (
 	"strings"
 )
 
-/*
-const (
-	CRLF                = "\r\n"
-	TAB                 = " "
-	FWS                 = CRLF + TAB
-	MaxHeaderLineLength = 70
-)
-*/
-/*
-type verifyOutput int
-
-const (
-	SUCCESS verifyOutput = 1 + iota
-	PERMFAIL
-	TEMPFAIL
-	NOTSIGNED
-	TESTINGSUCCESS
-	TESTINGPERMFAIL
-	TESTINGTEMPFAIL
-)
-*/
 // pubKeyRep represents a parsed version of public key record
 type pubKeyRep struct {
 	Version      string

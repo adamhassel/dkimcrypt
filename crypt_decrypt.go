@@ -11,14 +11,14 @@ import (
 )
 
 // Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-// private key file and a selector, which must be the same used for encryption
+// RSA private key file and a selector, which must be the same used for encryption
 func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
 	var pemData []byte
 	var block *pem.Block
 	var privkey *rsa.PrivateKey
 
 	if pemData, err = ioutil.ReadFile(privkeypath); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error reading private key in '%s': %s", privkeypath, err)
 	}
 
 	block, _ = pem.Decode(pemData)

@@ -18,7 +18,7 @@ func Sign(message []byte, privkeypath string) ([]byte, error) {
 	// Read the private key
 	pemData, err := ioutil.ReadFile(privkeypath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Error reading private key in '%s': %s", privkeypath, err)
 	}
 
 	// Extract the PEM-encoded data block
@@ -55,7 +55,7 @@ func Sign(message []byte, privkeypath string) ([]byte, error) {
 
 //func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
 
-// Verify a signature given the signature, the message it signed and a correct public key.
+// Verify a signature given the signature, the message it signed and the selector and domain that signed it.
 func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error) {
 
 	var pubkey *rsa.PublicKey
