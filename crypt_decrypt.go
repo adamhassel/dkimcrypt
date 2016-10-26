@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 )
 
+// Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
+// private key file and a selector, which must be the same used for encryption
 func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
 	var pemData []byte
 	var block *pem.Block
@@ -41,10 +43,13 @@ func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
 
 }
 
+// Encrypt will encrypt the data given in 'in', and return the encrypted
+// version in 'out', using the public key it finds in the DKIM-like TXT record
+// at <selector>._domainkey.<domain>. Use the same selector in 'Decrypt'
 func Encrypt(selector, domain string, in []byte) (out []byte, err error) {
 
 	var pubkey *rsa.PublicKey
-	if pubkey, err = GetPubKey(selector, domain); err != nil {
+	if pubkey, err = getPubKey(selector, domain); err != nil {
 		return nil, err
 	}
 

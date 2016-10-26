@@ -10,13 +10,15 @@ import (
 	"strings"
 )
 
+/*
 const (
 	CRLF                = "\r\n"
 	TAB                 = " "
 	FWS                 = CRLF + TAB
 	MaxHeaderLineLength = 70
 )
-
+*/
+/*
 type verifyOutput int
 
 const (
@@ -28,7 +30,7 @@ const (
 	TESTINGPERMFAIL
 	TESTINGTEMPFAIL
 )
-
+*/
 // pubKeyRep represents a parsed version of public key record
 type pubKeyRep struct {
 	Version      string
@@ -41,19 +43,19 @@ type pubKeyRep struct {
 	FlagIMustBeD bool // flag i
 }
 
-func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, verifyOutput, error) {
+func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, error) {
 	txt, err := net.LookupTXT(selector + "._domainkey." + domain)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return nil, PERMFAIL, ErrVerifyNoKeyForSignature
+			return nil, ErrVerifyNoKeyForSignature
 		} else {
-			return nil, TEMPFAIL, ErrVerifyKeyUnavailable
+			return nil, ErrVerifyKeyUnavailable
 		}
 	}
 
 	// empty record
 	if len(txt) == 0 {
-		return nil, PERMFAIL, ErrVerifyNoKeyForSignature
+		return nil, ErrVerifyNoKeyForSignature
 	}
 
 	pkr := new(pubKeyRep)
@@ -78,11 +80,11 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, verifyOutput, err
 		case "v":
 			// RFC: is this tag is specified it MUST be the first in the record
 			if i != 0 {
-				return nil, PERMFAIL, ErrVerifyTagVMustBeTheFirst
+				return nil, ErrVerifyTagVMustBeTheFirst
 			}
 			pkr.Version = val
 			if pkr.Version != "DKIM1" {
-				return nil, PERMFAIL, ErrVerifyVersionMusBeDkim1
+				return nil, ErrVerifyVersionMusBeDkim1
 			}
 		case "h":
 			p := strings.Split(strings.ToLower(val), ":")
@@ -99,18 +101,18 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, verifyOutput, err
 			}
 		case "k":
 			if strings.ToLower(val) != "rsa" {
-				return nil, PERMFAIL, ErrVerifyBadKeyType
+				return nil, ErrVerifyBadKeyType
 			}
 		case "n":
 			pkr.Note = val
 		case "p":
 			rawkey := val
 			if rawkey == "" {
-				return nil, PERMFAIL, ErrVerifyRevokedKey
+				return nil, ErrVerifyRevokedKey
 			}
 			un64, err := base64.StdEncoding.DecodeString(rawkey)
 			if err != nil {
-				return nil, PERMFAIL, ErrVerifyBadKey
+				return nil, ErrVerifyBadKey
 			}
 			pk, err := x509.ParsePKIXPublicKey(un64)
 			pkr.PubKey = *pk.(*rsa.PublicKey)
@@ -141,8 +143,18 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, verifyOutput, err
 
 	// if no pubkey
 	if pkr.PubKey == (rsa.PublicKey{}) {
-		return nil, PERMFAIL, ErrVerifyNoKey
+		return nil, ErrVerifyNoKey
 	}
 
-	return pkr, SUCCESS, nil
+	return pkr, nil
+}
+
+func getPubKey(selector, domain string) (*rsa.PublicKey, error) {
+	rep, err := newPubKeyFromDnsTxt(selector, domain)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &rep.PubKey, nil
 }

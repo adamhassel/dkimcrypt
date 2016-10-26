@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 )
 
+// SIgn will sign the message in 'message' using the private key in the file at 'privkeypath'.
 func Sign(message []byte, privkeypath string) ([]byte, error) {
 
 	// Read the private key
@@ -52,25 +53,15 @@ func Sign(message []byte, privkeypath string) ([]byte, error) {
 
 }
 
-// Verify a signature given the signature, the message it signed and a correct public key.
-func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
+//func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
 
-	// Decode RSA Public key
-	// Extract the PEM-encoded data block
-	block, _ := pem.Decode(publickey)
-	if block == nil {
-		return false, fmt.Errorf("bad key data: %s", "not PEM-encoded")
-	}
-	if got, want := block.Type, "PUBLIC KEY"; got != want {
-		return false, fmt.Errorf("unknown key type %q, want %q", got, want)
-	}
-	publickeyif, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return false, fmt.Errorf("bad public key: %s", err)
-	}
-	pubkey, ok := publickeyif.(*rsa.PublicKey)
-	if !ok {
-		return false, fmt.Errorf("Parsing type error")
+// Verify a signature given the signature, the message it signed and a correct public key.
+func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error) {
+
+	var pubkey *rsa.PublicKey
+
+	if pubkey, err = getPubKey(selector, domain); err != nil {
+		return false, err
 	}
 
 	var h crypto.Hash
@@ -80,12 +71,10 @@ func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
 	h = crypto.MD5
 
 	//VerifyPKCS1v15
-	err = rsa.VerifyPKCS1v15(pubkey, h, hashed, signature)
-
-	if err != nil {
-		return true, nil
-	} else {
-		return false, nil
+	if err = rsa.VerifyPKCS1v15(pubkey, h, hashed, signature); err != nil {
+		return false, err
 	}
+
+	return true, nil
 
 }
