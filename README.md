@@ -1,7 +1,7 @@
 
 
 # dkimcrypt
-`import "dkimcrypt"`
+`import "gitlab.one.com/go/dkimcrypt"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
