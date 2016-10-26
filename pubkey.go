@@ -1,5 +1,8 @@
 // This is sourced from https://github.com/toorop/go-dkim/blob/master/pubKeyRep.go
 
+// Package dkimcrypt provides convenient functions for en- or decrypting, as
+// well as signing and verifying data using a combination of local private key
+// files and public keys present in DKIM DNS TXT records
 package dkimcrypt
 
 import (
