@@ -82,7 +82,6 @@ func GetDNSKey(domain string) ([]DKrecord, error) {
 }
 
 func GetPubKey(selector, domain string) (*rsa.PublicKey, error) {
-
 	rep, _, err := newPubKeyFromDnsTxt(selector, domain)
 
 	if err != nil {
@@ -90,7 +89,6 @@ func GetPubKey(selector, domain string) (*rsa.PublicKey, error) {
 	}
 
 	return &rep.PubKey, nil
-
 }
 
 func parseTXTrecord(record []string) (rv []DKrecord, err error) {
