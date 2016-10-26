@@ -45,7 +45,7 @@ func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
 
 // Encrypt will encrypt the data given in 'in', and return the encrypted
 // version in 'out', using the public key it finds in the DKIM-like TXT record
-// at <selector>._domainkey.<domain>. Use the same selector in 'Decrypt'
+// at [selector]._domainkey.[domain]. Use the same selector in 'Decrypt'
 func Encrypt(selector, domain string, in []byte) (out []byte, err error) {
 
 	var pubkey *rsa.PublicKey

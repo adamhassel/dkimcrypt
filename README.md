@@ -18,7 +18,7 @@ files and public keys present in DKIM DNS TXT records
 * [Variables](#pkg-variables)
 * [func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error)](#Decrypt)
 * [func Encrypt(selector, domain string, in []byte) (out []byte, err error)](#Encrypt)
-* [func Sign(message []byte, privkeypath string) ([]byte, error)](#Sign)
+* [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
 * [func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error)](#Verify)
 
 
@@ -73,23 +73,25 @@ func Encrypt(selector, domain string, in []byte) (out []byte, err error)
 ```
 Encrypt will encrypt the data given in 'in', and return the encrypted
 version in 'out', using the public key it finds in the DKIM-like TXT record
-at <selector>._domainkey.<domain>. Use the same selector in 'Decrypt'
+at [selector]._domainkey.[domain]. Use the same selector in 'Decrypt'
 
 
 
-## <a name="Sign">func</a> [Sign](/src/target/sign_verify.go?s=236:297#L6)
+## <a name="Sign">func</a> [Sign](/src/target/sign_verify.go?s=236:305#L6)
 ``` go
-func Sign(message []byte, privkeypath string) ([]byte, error)
+func Sign(message []byte, privkeypath string) (out []byte, err error)
 ```
 SIgn will sign the message in 'message' using the private key in the file at 'privkeypath'.
 
 
 
-## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1400:1491#L49)
+## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1457:1548#L51)
 ``` go
 func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error)
 ```
-Verify a signature given the signature, the message it signed and the selector and domain that signed it.
+Verify a signature given the signature, the message it signed and the
+selector and domain that signed it. If ok is true, then the signature is
+good.
 
 
 

@@ -13,7 +13,7 @@ import (
 )
 
 // SIgn will sign the message in 'message' using the private key in the file at 'privkeypath'.
-func Sign(message []byte, privkeypath string) ([]byte, error) {
+func Sign(message []byte, privkeypath string) (out []byte, err error) {
 
 	// Read the private key
 	pemData, err := ioutil.ReadFile(privkeypath)
@@ -55,7 +55,9 @@ func Sign(message []byte, privkeypath string) ([]byte, error) {
 
 //func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
 
-// Verify a signature given the signature, the message it signed and the selector and domain that signed it.
+// Verify a signature given the signature, the message it signed and the
+// selector and domain that signed it. If ok is true, then the signature is
+// good.
 func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error) {
 
 	var pubkey *rsa.PublicKey
