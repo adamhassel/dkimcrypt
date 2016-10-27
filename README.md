@@ -16,10 +16,10 @@ files and public keys present in DKIM DNS TXT records
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error)](#Decrypt)
-* [func Encrypt(selector, domain string, in []byte) (out []byte, err error)](#Encrypt)
+* [func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err error)](#Decrypt)
+* [func Encrypt(selector, domain string, in []byte) (out, key []byte, err error)](#Encrypt)
 * [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
-* [func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error)](#Verify)
+* [func Verify(message []byte, signature []byte, selector, domain string) (err error)](#Verify)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -58,22 +58,23 @@ var (
 ```
 
 
-## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=306:383#L5)
+## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=2488:2570#L99)
 ``` go
-func Decrypt(selector, privkeypath string, in []byte) (out []byte, err error)
+func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err error)
 ```
 Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-RSA private key file and a selector, which must be the same used for encryption
+RSA private key file, an RSA-encrypted key and a selector, which must be the same used for encryption
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=1404:1476#L39)
+## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=3062:3139#L119)
 ``` go
-func Encrypt(selector, domain string, in []byte) (out []byte, err error)
+func Encrypt(selector, domain string, in []byte) (out, key []byte, err error)
 ```
-Encrypt will encrypt the data given in 'in', and return the encrypted
-version in 'out', using the public key it finds in the DKIM-like TXT record
-at [selector]._domainkey.[domain]. Use the same selector in 'Decrypt'
+Encrypt will AES-encrypt the data given in 'in', and return the encrypted
+version in 'out', as well as a key, which is RSA-encrypted using the public
+key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain].
+Use the same selector in 'Decrypt'
 
 
 
@@ -85,12 +86,12 @@ SIgn will sign the message in 'message' using the private key in the file at 'pr
 
 
 
-## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1457:1548#L51)
+## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1457:1539#L51)
 ``` go
-func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error)
+func Verify(message []byte, signature []byte, selector, domain string) (err error)
 ```
 Verify a signature given the signature, the message it signed and the
-selector and domain that signed it. If ok is true, then the signature is
+selector and domain that signed it. If err is nil, then the signature is
 good.
 
 
