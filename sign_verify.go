@@ -56,14 +56,14 @@ func Sign(message []byte, privkeypath string) (out []byte, err error) {
 //func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
 
 // Verify a signature given the signature, the message it signed and the
-// selector and domain that signed it. If ok is true, then the signature is
+// selector and domain that signed it. If err is nil, then the signature is
 // good.
-func Verify(message []byte, signature []byte, selector, domain string) (ok bool, err error) {
+func Verify(message []byte, signature []byte, selector, domain string) (err error) {
 
 	var pubkey *rsa.PublicKey
 
 	if pubkey, err = getPubKey(selector, domain); err != nil {
-		return false, err
+		return err
 	}
 
 	var h crypto.Hash
@@ -74,9 +74,9 @@ func Verify(message []byte, signature []byte, selector, domain string) (ok bool,
 
 	//VerifyPKCS1v15
 	if err = rsa.VerifyPKCS1v15(pubkey, h, hashed, signature); err != nil {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 
 }
