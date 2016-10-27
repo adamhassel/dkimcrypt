@@ -145,7 +145,7 @@ func Encrypt(selector, domain string, in []byte) (out, key []byte, err error) {
 
 }
 
-// Make a 32 bit random key
+// Make a 32 byte random key
 func makekey() (key []byte, err error) {
 	key = make([]byte, 32)
 
