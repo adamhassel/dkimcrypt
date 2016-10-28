@@ -3,9 +3,10 @@ package dkimcrypt
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -36,7 +37,7 @@ func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error)
 		return nil, fmt.Errorf("Bad private key: %s", err)
 	}
 
-	if out, err = rsa.DecryptOAEP(sha1.New(), rand.Reader, privkey, in, []byte(selector)); err != nil {
+	if out, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, in, []byte(selector)); err != nil {
 		return nil, fmt.Errorf("Decrypt: %s", err)
 	}
 
@@ -51,7 +52,7 @@ func rsaEncrypt(selector, domain string, in []byte) (out []byte, err error) {
 		return nil, err
 	}
 
-	if out, err = rsa.EncryptOAEP(sha1.New(), rand.Reader, pubkey, in, []byte(selector)); err != nil {
+	if out, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey, in, []byte(selector)); err != nil {
 		return nil, err
 	}
 
@@ -105,8 +106,9 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 }
 
 // Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-// RSA private key file, an RSA-encrypted key and a selector, which must be the same used for encryption
-func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err error) {
+// RSA private key file, an RSA-encrypted key, a message authentication code hash,
+// and a selector, which must be the same used for encryption
+func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error) {
 
 	var uk []byte // unencrypted key
 
@@ -118,30 +120,44 @@ func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err erro
 		return nil, err
 	}
 
+	// Verify
+	hash := hmac.New(sha256.New, uk)
+	hash.Write(out)
+	checkmac := hash.Sum(nil)
+
+	if !hmac.Equal(mac, checkmac) {
+		return nil, fmt.Errorf("Encrypted data could not be authenticated")
+	}
+
 	return out, nil
 
 }
 
 // Encrypt will AES-encrypt the data given in 'in', and return the encrypted
 // version in 'out', as well as a key, which is RSA-encrypted using the public
-// key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain].
-// Use the same selector in 'Decrypt'
-func Encrypt(selector, domain string, in []byte) (out, key []byte, err error) {
+// key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain],
+// and a message authentication code hash.  Use the same selector in 'Decrypt'
+func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error) {
 
 	var uk []byte // unencrypted, random 32-byte key
 	if uk, err = makekey(); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if key, err = rsaEncrypt(selector, domain, uk); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if out, err = aesEncrypt(uk, in); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return out, key, nil
+	// Sign
+	hash := hmac.New(sha256.New, uk)
+	hash.Write(in)
+	mac = hash.Sum(nil)
+
+	return out, key, mac, nil
 
 }
 

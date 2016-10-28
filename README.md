@@ -16,8 +16,8 @@ files and public keys present in DKIM DNS TXT records
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err error)](#Decrypt)
-* [func Encrypt(selector, domain string, in []byte) (out, key []byte, err error)](#Encrypt)
+* [func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)](#Decrypt)
+* [func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)](#Encrypt)
 * [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
 * [func Verify(message []byte, signature []byte, selector, domain string) (err error)](#Verify)
 
@@ -58,23 +58,24 @@ var (
 ```
 
 
-## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=2488:2570#L99)
+## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=2549:2636#L101)
 ``` go
-func Decrypt(selector, privkeypath string, in, key []byte) (out []byte, err error)
+func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
 Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-RSA private key file, an RSA-encrypted key and a selector, which must be the same used for encryption
+RSA private key file, an RSA-encrypted key, a message authentication code hash,
+and a selector, which must be the same used for encryption
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=3062:3139#L119)
+## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=3366:3448#L130)
 ``` go
-func Encrypt(selector, domain string, in []byte) (out, key []byte, err error)
+func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
 Encrypt will AES-encrypt the data given in 'in', and return the encrypted
 version in 'out', as well as a key, which is RSA-encrypted using the public
-key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain].
-Use the same selector in 'Decrypt'
+key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain],
+and a message authentication code hash.  Use the same selector in 'Decrypt'
 
 
 
