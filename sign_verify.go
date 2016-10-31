@@ -53,12 +53,10 @@ func Sign(message []byte, privkeypath string) (out []byte, err error) {
 
 }
 
-//func Verify(message []byte, signature []byte, publickey []byte) (bool, error) {
-
 // Verify a signature given the signature, the message it signed and the
 // selector and domain that signed it. If err is nil, then the signature is
 // good.
-func Verify(message []byte, signature []byte, selector, domain string) (err error) {
+func Verify(message, signature []byte, selector, domain string) (err error) {
 
 	var pubkey *rsa.PublicKey
 

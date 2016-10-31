@@ -16,17 +16,16 @@ files and public keys present in DKIM DNS TXT records
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
 * [func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)](#Decrypt)
 * [func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)](#DecryptSingle)
 * [func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)](#Encrypt)
 * [func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)](#EncryptSingle)
 * [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
-* [func Verify(message []byte, signature []byte, selector, domain string) (err error)](#Verify)
+* [func Verify(message, signature []byte, selector, domain string) (err error)](#Verify)
 
 
 #### <a name="pkg-files">Package files</a>
-[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [errors.go](/src/dkimcrypt/errors.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
+[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
 
 
 ## <a name="pkg-constants">Constants</a>
@@ -37,26 +36,6 @@ const (
 )
 ```
 
-## <a name="pkg-variables">Variables</a>
-``` go
-var (
-    ErrVerifyNoKeyForSignature = errors.New("no key for verify")
-
-    ErrVerifyKeyUnavailable = errors.New("key unavailable")
-
-    ErrVerifyTagVMustBeTheFirst = errors.New("pub key syntax error: v tag must be the first")
-
-    ErrVerifyVersionMusBeDkim1 = errors.New("flag v must be set to DKIM1")
-
-    ErrVerifyBadKeyType = errors.New("bad type for key type")
-
-    ErrVerifyRevokedKey = errors.New("revoked key")
-
-    ErrVerifyBadKey = errors.New("unable to parse pub key")
-
-    ErrVerifyNoKey = errors.New("no public key found in DNS TXT")
-)
-```
 
 
 ## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=3371:3458#L129)
@@ -108,9 +87,9 @@ SIgn will sign the message in 'message' using the private key in the file at 'pr
 
 
 
-## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1457:1539#L51)
+## <a name="Verify">func</a> [Verify](/src/target/sign_verify.go?s=1374:1449#L49)
 ``` go
-func Verify(message []byte, signature []byte, selector, domain string) (err error)
+func Verify(message, signature []byte, selector, domain string) (err error)
 ```
 Verify a signature given the signature, the message it signed and the
 selector and domain that signed it. If err is nil, then the signature is

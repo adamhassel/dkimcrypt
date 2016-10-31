@@ -9,6 +9,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"fmt"
 	"net"
 	"strings"
 )
@@ -29,15 +30,15 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, error) {
 	txt, err := net.LookupTXT(selector + "._domainkey." + domain)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such host") {
-			return nil, ErrVerifyNoKeyForSignature
+			return nil, fmt.Errorf("No key found for %s", domain)
 		} else {
-			return nil, ErrVerifyKeyUnavailable
+			return nil, fmt.Errorf("Service not available")
 		}
 	}
 
 	// empty record
 	if len(txt) == 0 {
-		return nil, ErrVerifyNoKeyForSignature
+		return nil, fmt.Errorf("No key found for %s", domain)
 	}
 
 	pkr := new(pubKeyRep)
@@ -62,11 +63,11 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, error) {
 		case "v":
 			// RFC: is this tag is specified it MUST be the first in the record
 			if i != 0 {
-				return nil, ErrVerifyTagVMustBeTheFirst
+				return nil, fmt.Errorf("Record syntax error: V tag must be first")
 			}
 			pkr.Version = val
 			if pkr.Version != "DKIM1" {
-				return nil, ErrVerifyVersionMusBeDkim1
+				return nil, fmt.Errorf("Version was not DKIM 1")
 			}
 		case "h":
 			p := strings.Split(strings.ToLower(val), ":")
@@ -83,18 +84,18 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, error) {
 			}
 		case "k":
 			if strings.ToLower(val) != "rsa" {
-				return nil, ErrVerifyBadKeyType
+				return nil, fmt.Errorf("Bad key type, must be 'rsa'")
 			}
 		case "n":
 			pkr.Note = val
 		case "p":
 			rawkey := val
 			if rawkey == "" {
-				return nil, ErrVerifyRevokedKey
+				return nil, fmt.Errorf("Key revoked")
 			}
 			un64, err := base64.StdEncoding.DecodeString(rawkey)
 			if err != nil {
-				return nil, ErrVerifyBadKey
+				return nil, fmt.Errorf("Public key parse error")
 			}
 			pk, err := x509.ParsePKIXPublicKey(un64)
 			pkr.PubKey = *pk.(*rsa.PublicKey)
@@ -125,7 +126,7 @@ func newPubKeyFromDnsTxt(selector, domain string) (*pubKeyRep, error) {
 
 	// if no pubkey
 	if pkr.PubKey == (rsa.PublicKey{}) {
-		return nil, ErrVerifyNoKey
+		return nil, fmt.Errorf("No public key found")
 	}
 
 	return pkr, nil
