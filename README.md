@@ -31,14 +31,14 @@ files and public keys present in DKIM DNS TXT records
 ## <a name="pkg-constants">Constants</a>
 ``` go
 const (
-    KeySize = 256
-    MacSize = 32
+    KeySize = sha256.Size * 8
+    MacSize = sha256.Size
 )
 ```
 
 
 
-## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=3371:3458#L129)
+## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=3392:3479#L129)
 ``` go
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
@@ -48,7 +48,7 @@ and a selector, which must be the same used for encryption
 
 
 
-## <a name="DecryptSingle">func</a> [DecryptSingle](/src/target/crypt_decrypt.go?s=2455:2538#L105)
+## <a name="DecryptSingle">func</a> [DecryptSingle](/src/target/crypt_decrypt.go?s=2476:2559#L105)
 ``` go
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)
 ```
@@ -57,7 +57,7 @@ encrypted by EncryptSingle
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=4188:4270#L158)
+## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=4209:4291#L158)
 ``` go
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
@@ -68,7 +68,7 @@ and a message authentication code hash.  Use the same selector in 'Decrypt'
 
 
 
-## <a name="EncryptSingle">func</a> [EncryptSingle](/src/target/crypt_decrypt.go?s=2890:2968#L116)
+## <a name="EncryptSingle">func</a> [EncryptSingle](/src/target/crypt_decrypt.go?s=2911:2989#L116)
 ``` go
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
 ```

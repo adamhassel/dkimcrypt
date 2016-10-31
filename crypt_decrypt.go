@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	KeySize = 256
-	MacSize = 32
+	KeySize = sha256.Size * 8
+	MacSize = sha256.Size
 )
 
 func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
@@ -191,7 +191,7 @@ func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err erro
 
 // Make a 32 byte random key
 func makekey() (key []byte, err error) {
-	key = make([]byte, 32)
+	key = make([]byte, KeySize/8)
 
 	if _, err = rand.Read(key); err != nil {
 		return nil, err
