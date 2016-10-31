@@ -14,6 +14,11 @@ import (
 	"io/ioutil"
 )
 
+const (
+	KeySize = 256
+	MacSize = 32
+)
+
 func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
 	var pemData []byte
 	var block *pem.Block
@@ -105,6 +110,29 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 	return
 }
 
+// DecryptSingle is a wrapper around Decrypt, which will decrypt a byte slice
+// encrypted by EncryptSingle
+func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error) {
+
+	crypt, key, mac := deconstructcryptdata(in)
+
+	return Decrypt(selector, privkeypath, crypt, key, mac)
+}
+
+// EncryptSingle is a wrapper around Encrypt, which will encrypt a byte slice
+// and return a single byte slice representing a key, a verification hash and
+// the ecrypted data, useful for sendingover a network. Decrypt using
+// DecryptSingle
+func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
+
+	if crypt, key, mac, err := Encrypt(selector, domain, in); err == nil {
+		return constructcryptdata(crypt, key, mac), err
+	} else {
+		return nil, err
+	}
+
+}
+
 // Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
 // RSA private key file, an RSA-encrypted key, a message authentication code hash,
 // and a selector, which must be the same used for encryption
@@ -170,4 +198,26 @@ func makekey() (key []byte, err error) {
 	}
 
 	return key, nil
+}
+
+func constructcryptdata(crypt, key, mac []byte) (cryptdata []byte) {
+
+	cryptdata = make([]byte, 0)
+
+	cryptdata = append(cryptdata, mac...)
+	cryptdata = append(cryptdata, key...)
+	cryptdata = append(cryptdata, crypt...)
+
+	return
+}
+
+func deconstructcryptdata(cryptdata []byte) (data, key, mac []byte) {
+
+	data = make([]byte, len(cryptdata)-KeySize-MacSize)
+	key = make([]byte, KeySize)
+	mac = make([]byte, MacSize)
+
+	mac, key, data = cryptdata[:MacSize], cryptdata[MacSize:MacSize+KeySize], cryptdata[MacSize+KeySize:]
+
+	return
 }

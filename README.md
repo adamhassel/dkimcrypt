@@ -15,9 +15,12 @@ files and public keys present in DKIM DNS TXT records
 
 
 ## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
 * [Variables](#pkg-variables)
 * [func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)](#Decrypt)
+* [func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)](#DecryptSingle)
 * [func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)](#Encrypt)
+* [func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)](#EncryptSingle)
 * [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
 * [func Verify(message []byte, signature []byte, selector, domain string) (err error)](#Verify)
 
@@ -26,39 +29,37 @@ files and public keys present in DKIM DNS TXT records
 [crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [errors.go](/src/dkimcrypt/errors.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
 
 
+## <a name="pkg-constants">Constants</a>
+``` go
+const (
+    KeySize = 256
+    MacSize = 32
+)
+```
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
 var (
-
-    // ErrVerifyNoKeyForSignature no key
     ErrVerifyNoKeyForSignature = errors.New("no key for verify")
 
-    // ErrVerifyKeyUnavailable when service (dns) is anavailable
     ErrVerifyKeyUnavailable = errors.New("key unavailable")
 
-    // ErrVerifyTagVMustBeTheFirst if present the v tag must be the firts in the record
     ErrVerifyTagVMustBeTheFirst = errors.New("pub key syntax error: v tag must be the first")
 
-    // ErrVerifyVersionMusBeDkim1 if présent flag v (version) must be DKIM1
     ErrVerifyVersionMusBeDkim1 = errors.New("flag v must be set to DKIM1")
 
-    // ErrVerifyBadKeyType bad type for pub key (only rsa is accepted)
     ErrVerifyBadKeyType = errors.New("bad type for key type")
 
-    // ErrVerifyRevokedKey key(s) for this selector is revoked (p is empty)
     ErrVerifyRevokedKey = errors.New("revoked key")
 
-    // ErrVerifyBadKey when we can't parse pubkey
     ErrVerifyBadKey = errors.New("unable to parse pub key")
 
-    // ErrVerifyNoKey when no key is found on DNS record
     ErrVerifyNoKey = errors.New("no public key found in DNS TXT")
 )
 ```
 
 
-## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=2549:2636#L101)
+## <a name="Decrypt">func</a> [Decrypt](/src/target/crypt_decrypt.go?s=3371:3458#L129)
 ``` go
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
@@ -68,7 +69,16 @@ and a selector, which must be the same used for encryption
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=3366:3448#L130)
+## <a name="DecryptSingle">func</a> [DecryptSingle](/src/target/crypt_decrypt.go?s=2455:2538#L105)
+``` go
+func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)
+```
+DecryptSingle is a wrapper around Decrypt, which will decrypt a byte slice
+encrypted by EncryptSingle
+
+
+
+## <a name="Encrypt">func</a> [Encrypt](/src/target/crypt_decrypt.go?s=4188:4270#L158)
 ``` go
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
@@ -76,6 +86,17 @@ Encrypt will AES-encrypt the data given in 'in', and return the encrypted
 version in 'out', as well as a key, which is RSA-encrypted using the public
 key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain],
 and a message authentication code hash.  Use the same selector in 'Decrypt'
+
+
+
+## <a name="EncryptSingle">func</a> [EncryptSingle](/src/target/crypt_decrypt.go?s=2890:2968#L116)
+``` go
+func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
+```
+EncryptSingle is a wrapper around Encrypt, which will encrypt a byte slice
+and return a single byte slice representing a key, a verification hash and
+the ecrypted data, useful for sendingover a network. Decrypt using
+DecryptSingle
 
 
 
