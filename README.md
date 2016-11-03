@@ -26,7 +26,7 @@ files and public keys present in DKIM DNS TXT records
 
 
 #### <a name="pkg-files">Package files</a>
-[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
+[crypt_decrypt.go](/../blob/master/crypt_decrypt.go) [pubkey.go](/../blob/master/pubkey.go) [sign_verify.go](/../blob/master/sign_verify.go) 
 
 
 ## <a name="pkg-constants">Constants</a>
@@ -39,7 +39,7 @@ const (
 
 
 
-## <a name="Decrypt">func</a> [Decrypt](/src/dkimcrypt/crypt_decrypt.go?s=3392:3479#L129)
+## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3392:3479#L129)
 ``` go
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
@@ -49,7 +49,7 @@ and a selector, which must be the same used for encryption
 
 
 
-## <a name="DecryptSingle">func</a> [DecryptSingle](/src/dkimcrypt/crypt_decrypt.go?s=2476:2559#L105)
+## <a name="DecryptSingle">func</a> [DecryptSingle](/../blob/master/crypt_decrypt.go?s=2476:2559#L105)
 ``` go
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)
 ```
@@ -58,7 +58,7 @@ encrypted by EncryptSingle
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/src/dkimcrypt/crypt_decrypt.go?s=4209:4291#L158)
+## <a name="Encrypt">func</a> [Encrypt](/../blob/master/crypt_decrypt.go?s=4209:4291#L158)
 ``` go
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
@@ -69,7 +69,7 @@ and a message authentication code hash.  Use the same selector in 'Decrypt'
 
 
 
-## <a name="EncryptSingle">func</a> [EncryptSingle](/src/dkimcrypt/crypt_decrypt.go?s=2911:2989#L116)
+## <a name="EncryptSingle">func</a> [EncryptSingle](/../blob/master/crypt_decrypt.go?s=2911:2989#L116)
 ``` go
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
 ```
@@ -80,7 +80,7 @@ DecryptSingle
 
 
 
-## <a name="Sign">func</a> [Sign](/src/dkimcrypt/sign_verify.go?s=236:305#L6)
+## <a name="Sign">func</a> [Sign](/../blob/master/sign_verify.go?s=236:305#L6)
 ``` go
 func Sign(message []byte, privkeypath string) (out []byte, err error)
 ```
@@ -88,7 +88,7 @@ SIgn will sign the message in 'message' using the private key in the file at 'pr
 
 
 
-## <a name="Verify">func</a> [Verify](/src/dkimcrypt/sign_verify.go?s=1374:1449#L49)
+## <a name="Verify">func</a> [Verify](/../blob/master/sign_verify.go?s=1374:1449#L49)
 ``` go
 func Verify(message, signature []byte, selector, domain string) (err error)
 ```
