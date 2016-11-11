@@ -115,6 +115,10 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 // encrypted by EncryptSingle
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error) {
 
+	if len(in) < KeySize+MacSize {
+		return nil, fmt.Errorf("Data length too short")
+	}
+
 	crypt, key, mac := deconstructcryptdata(in)
 
 	return Decrypt(selector, privkeypath, crypt, key, mac)
