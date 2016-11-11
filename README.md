@@ -1,7 +1,7 @@
 
 
 # dkimcrypt
-`import "gitlab.one.com/go/dkimcrypt"`
+`import "github.one.com/go/dkimcrypt"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -26,7 +26,7 @@ files and public keys present in DKIM DNS TXT records
 
 
 #### <a name="pkg-files">Package files</a>
-[crypt_decrypt.go](/../blob/master/crypt_decrypt.go) [pubkey.go](/../blob/master/pubkey.go) [sign_verify.go](/../blob/master/sign_verify.go) 
+[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
 
 
 ## <a name="pkg-constants">Constants</a>

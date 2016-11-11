@@ -12,7 +12,7 @@ import (
 	"io/ioutil"
 )
 
-// SIgn will sign the message in 'message' using the private key in the file at 'privkeypath'.
+// Sign will sign the message in 'message' using the private key in the file at 'privkeypath'.
 func Sign(message []byte, privkeypath string) (out []byte, err error) {
 
 	// Read the private key

@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 )
 
+// KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
 const (
 	KeySize = sha256.Size * 8
 	MacSize = sha256.Size
@@ -127,9 +128,8 @@ func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
 
 	if crypt, key, mac, err := Encrypt(selector, domain, in); err == nil {
 		return constructcryptdata(crypt, key, mac), err
-	} else {
-		return nil, err
 	}
+	return nil, err
 
 }
 
