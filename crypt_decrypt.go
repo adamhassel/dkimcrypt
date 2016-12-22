@@ -35,12 +35,19 @@ func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error)
 		return nil, fmt.Errorf("Bad key data in %s: Not PEM-encoded", privkeypath)
 	}
 
-	if got, want := block.Type, "RSA PRIVATE KEY"; got != want {
-		return nil, fmt.Errorf("Unknown key type '%s', want '%s'", got, want)
-	}
-
-	if privkey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
-		return nil, fmt.Errorf("Bad private key: %s", err)
+	switch block.Type {
+	case "PRIVATE KEY":
+		var tmp interface{}
+		if tmp, err = x509.ParsePKCS8PrivateKey(block.Bytes); err != nil {
+			return nil, fmt.Errorf("Bad private key: %s", err)
+		}
+		privkey = tmp.(*rsa.PrivateKey)
+	case "RSA PRIVATE KEY":
+		if privkey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
+			return nil, fmt.Errorf("Bad private key: %s", err)
+		}
+	default:
+		return nil, fmt.Errorf("Unknown key type '%s', want either '%s' or '%s'", block.Type, "PRIVATE KEY", "RSA PRIVATE KEY")
 	}
 
 	if out, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, in, []byte(selector)); err != nil {
