@@ -5,35 +5,16 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
-	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 // Sign will sign the message in 'message' using the private key in the file at 'privkeypath'.
 func Sign(message []byte, privkeypath string) (out []byte, err error) {
 
-	// Read the private key
-	pemData, err := ioutil.ReadFile(privkeypath)
-	if err != nil {
-		return nil, fmt.Errorf("Error reading private key in '%s': %s", privkeypath, err)
-	}
+	var privatekey *rsa.PrivateKey
 
-	// Extract the PEM-encoded data block
-	block, _ := pem.Decode(pemData)
-	if block == nil {
-		return nil, fmt.Errorf("bad key data: %s", "not PEM-encoded")
-	}
-	if got, want := block.Type, "RSA PRIVATE KEY"; got != want {
-		return nil, fmt.Errorf("unknown key type %q, want %q", got, want)
-	}
-
-	// Decode the RSA private key
-	privatekey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, fmt.Errorf("bad private key: %s", err)
+	if privatekey, err = getPrivKeyFromFile(privkeypath); err != nil {
+		return nil, err
 	}
 
 	// SignPKCS1v15

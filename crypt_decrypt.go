@@ -7,11 +7,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 // KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
@@ -21,33 +18,10 @@ const (
 )
 
 func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
-	var pemData []byte
-	var block *pem.Block
 	var privkey *rsa.PrivateKey
 
-	if pemData, err = ioutil.ReadFile(privkeypath); err != nil {
-		return nil, fmt.Errorf("Error reading private key in '%s': %s", privkeypath, err)
-	}
-
-	block, _ = pem.Decode(pemData)
-
-	if block == nil {
-		return nil, fmt.Errorf("Bad key data in %s: Not PEM-encoded", privkeypath)
-	}
-
-	switch block.Type {
-	case "PRIVATE KEY":
-		var tmp interface{}
-		if tmp, err = x509.ParsePKCS8PrivateKey(block.Bytes); err != nil {
-			return nil, fmt.Errorf("Bad private key: %s", err)
-		}
-		privkey = tmp.(*rsa.PrivateKey)
-	case "RSA PRIVATE KEY":
-		if privkey, err = x509.ParsePKCS1PrivateKey(block.Bytes); err != nil {
-			return nil, fmt.Errorf("Bad private key: %s", err)
-		}
-	default:
-		return nil, fmt.Errorf("Unknown key type '%s', want either '%s' or '%s'", block.Type, "PRIVATE KEY", "RSA PRIVATE KEY")
+	if privkey, err = getPrivKeyFromFile(privkeypath); err != nil {
+		return nil, fmt.Errorf("Couldn't read private key: %s", err)
 	}
 
 	if out, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, in, []byte(selector)); err != nil {
