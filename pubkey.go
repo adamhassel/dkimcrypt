@@ -29,10 +29,10 @@ type pubKeyRep struct {
 func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 	txt, err := net.LookupTXT(selector + "._domainkey." + domain)
 	if err != nil {
-		if strings.HasSuffix(err.Error(), "no such host") {
+		if strings.Contains(err.Error(), "no such host") {
 			return nil, fmt.Errorf("No key found for %s", domain)
 		}
-		return nil, fmt.Errorf("Service not available")
+		return nil, fmt.Errorf("Service not available: %s", err)
 	}
 
 	// empty record
