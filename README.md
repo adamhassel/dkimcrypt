@@ -77,7 +77,7 @@ func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
 ```
 EncryptSingle is a wrapper around Encrypt, which will encrypt a byte slice
 and return a single byte slice representing a key, a verification hash and
-the ecrypted data, useful for sendingover a network. Decrypt using
+the ecrypted data, useful for sending over a network. Decrypt using
 DecryptSingle
 
 
