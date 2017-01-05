@@ -8,7 +8,8 @@ import (
 	"io"
 )
 
-// Sign will sign the message in 'message' using the private key in the file at 'privkeypath'.
+// Sign will return the signature of the message in 'message' using the private
+// key in the file at 'privkeypath'.
 func Sign(message []byte, privkeypath string) (out []byte, err error) {
 
 	var privatekey *rsa.PrivateKey

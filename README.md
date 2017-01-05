@@ -1,7 +1,7 @@
 
 
 # dkimcrypt
-`import "github.one.com/go/dkimcrypt"`
+`import "gitlab.one.com/go/dkimcrypt"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -26,7 +26,7 @@ files and public keys present in DKIM DNS TXT records
 
 
 #### <a name="pkg-files">Package files</a>
-[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
+[crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [privkey.go](/src/dkimcrypt/privkey.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
 
 
 ## <a name="pkg-constants">Constants</a>
@@ -36,10 +36,12 @@ const (
     MacSize = sha256.Size
 )
 ```
+KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
 
 
 
-## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3392:3479#L129)
+
+## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3093:3180#L116)
 ``` go
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
@@ -49,7 +51,7 @@ and a selector, which must be the same used for encryption
 
 
 
-## <a name="DecryptSingle">func</a> [DecryptSingle](/../blob/master/crypt_decrypt.go?s=2476:2559#L105)
+## <a name="DecryptSingle">func</a> [DecryptSingle](/../blob/master/crypt_decrypt.go?s=2074:2157#L87)
 ``` go
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)
 ```
@@ -58,7 +60,7 @@ encrypted by EncryptSingle
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/../blob/master/crypt_decrypt.go?s=4209:4291#L158)
+## <a name="Encrypt">func</a> [Encrypt](/../blob/master/crypt_decrypt.go?s=3910:3992#L145)
 ``` go
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
@@ -69,7 +71,7 @@ and a message authentication code hash.  Use the same selector in 'Decrypt'
 
 
 
-## <a name="EncryptSingle">func</a> [EncryptSingle](/../blob/master/crypt_decrypt.go?s=2911:2989#L116)
+## <a name="EncryptSingle">func</a> [EncryptSingle](/../blob/master/crypt_decrypt.go?s=2595:2673#L102)
 ``` go
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
 ```
@@ -80,15 +82,16 @@ DecryptSingle
 
 
 
-## <a name="Sign">func</a> [Sign](/../blob/master/sign_verify.go?s=236:305#L6)
+## <a name="Sign">func</a> [Sign](/../blob/master/sign_verify.go?s=207:276#L3)
 ``` go
 func Sign(message []byte, privkeypath string) (out []byte, err error)
 ```
-SIgn will sign the message in 'message' using the private key in the file at 'privkeypath'.
+Sign will return the signature of the message in 'message' using the private
+key in the file at 'privkeypath'.
 
 
 
-## <a name="Verify">func</a> [Verify](/../blob/master/sign_verify.go?s=1374:1449#L49)
+## <a name="Verify">func</a> [Verify](/../blob/master/sign_verify.go?s=836:911#L31)
 ``` go
 func Verify(message, signature []byte, selector, domain string) (err error)
 ```
