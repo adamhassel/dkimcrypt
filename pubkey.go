@@ -30,7 +30,7 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 	txt, err := net.LookupTXT(selector + "._domainkey." + domain)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such host") {
-			return nil, fmt.Errorf("No key found for %s", domain)
+			return nil, fmt.Errorf("No key found for %s: %s", domain, err)
 		}
 		return nil, fmt.Errorf("Service not available: %s", err)
 	}
@@ -132,6 +132,7 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 }
 
 func getPubKey(selector, domain string) (*rsa.PublicKey, error) {
+
 	rep, err := newPubKeyFromDNSTxt(selector, domain)
 
 	if err != nil {

@@ -111,7 +111,9 @@ func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err err
 // DecryptSingle
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
 
-	if crypt, key, mac, err := Encrypt(selector, domain, in); err == nil {
+	var crypt, key, mac []byte
+
+	if crypt, key, mac, err = Encrypt(selector, domain, in); err == nil {
 		return constructcryptdata(crypt, key, mac), err
 	}
 	return nil, err
