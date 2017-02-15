@@ -43,3 +43,8 @@ func getPrivKeyFromFile(filename string) (key *rsa.PrivateKey, err error) {
 
 	return privkey, nil
 }
+
+// GetPrivateKey loads a private key from the given filename and returns it.
+func GetPrivateKey(filename string) (*rsa.PrivateKey, error) {
+	return getPrivKeyFromFile(filename)
+}

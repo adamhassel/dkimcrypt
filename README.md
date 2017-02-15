@@ -21,6 +21,8 @@ files and public keys present in DKIM DNS TXT records
 * [func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)](#DecryptSingle)
 * [func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)](#Encrypt)
 * [func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)](#EncryptSingle)
+* [func GetPrivateKey(filename string) (*rsa.PrivateKey, error)](#GetPrivateKey)
+* [func GetPublicKey(selector, domain string) (*rsa.PublicKey, error)](#GetPublicKey)
 * [func Sign(message []byte, privkeypath string) (out []byte, err error)](#Sign)
 * [func Verify(message, signature []byte, selector, domain string) (err error)](#Verify)
 
@@ -39,9 +41,7 @@ const (
 KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
 
 
-
-
-## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3093:3180#L116)
+## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3094:3181#L116)
 ``` go
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
@@ -60,7 +60,7 @@ encrypted by EncryptSingle
 
 
 
-## <a name="Encrypt">func</a> [Encrypt](/../blob/master/crypt_decrypt.go?s=3910:3992#L145)
+## <a name="Encrypt">func</a> [Encrypt](/../blob/master/crypt_decrypt.go?s=3911:3993#L145)
 ``` go
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)
 ```
@@ -71,7 +71,7 @@ and a message authentication code hash.  Use the same selector in 'Decrypt'
 
 
 
-## <a name="EncryptSingle">func</a> [EncryptSingle](/../blob/master/crypt_decrypt.go?s=2595:2673#L102)
+## <a name="EncryptSingle">func</a> [EncryptSingle](/../blob/master/crypt_decrypt.go?s=2596:2674#L102)
 ``` go
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error)
 ```
@@ -79,6 +79,23 @@ EncryptSingle is a wrapper around Encrypt, which will encrypt a byte slice
 and return a single byte slice representing a key, a verification hash and
 the ecrypted data, useful for sending over a network. Decrypt using
 DecryptSingle
+
+
+
+## <a name="GetPrivateKey">func</a> [GetPrivateKey](/../blob/master/privkey.go?s=1166:1226#L38)
+``` go
+func GetPrivateKey(filename string) (*rsa.PrivateKey, error)
+```
+GetPrivateKey loads a private key from the given filename and returns it.
+
+
+
+## <a name="GetPublicKey">func</a> [GetPublicKey](/../blob/master/pubkey.go?s=3642:3708#L137)
+``` go
+func GetPublicKey(selector, domain string) (*rsa.PublicKey, error)
+```
+GetPublicKey will look up a public key for a domain with selector, and
+return it. If no key is found, an error is returned.
 
 
 

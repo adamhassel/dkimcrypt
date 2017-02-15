@@ -131,13 +131,19 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 	return pkr, nil
 }
 
-func getPubKey(selector, domain string) (*rsa.PublicKey, error) {
+func getPubKey(selector, hostname string) (*rsa.PublicKey, error) {
 
-	rep, err := newPubKeyFromDNSTxt(selector, domain)
+	rep, err := newPubKeyFromDNSTxt(selector, hostname)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &rep.PubKey, nil
+}
+
+// GetPublicKey will look up a public key for a domain with selector, and
+// return it. If no key is found, an error is returned.
+func GetPublicKey(selector, domain string) (*rsa.PublicKey, error) {
+	return getPubKey(selector, domain)
 }
