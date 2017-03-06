@@ -120,9 +120,10 @@ func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
 
 }
 
-// Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-// RSA private key file, an RSA-encrypted key, a message authentication code hash,
-// and a selector, which must be the same used for encryption
+// Decrypt will decrypt the data in 'in' and return it in 'out', given the path
+// to a PEM-encoded private key file, an RSA-encrypted key, a message
+// authentication code hash, and a selector, which must be the same used for
+// encryption
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error) {
 
 	var uk []byte // unencrypted key
