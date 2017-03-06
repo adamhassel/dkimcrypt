@@ -46,7 +46,7 @@ KeySize and MacSize are the sizes in bits of the AES key and the Authentication 
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)
 ```
 Decrypt will decrypt the data in 'in' and return it in 'out', given the path to a PEM-encoded
-RSA private key file, an RSA-encrypted key, a message authentication code hash,
+private key file, an RSA-encrypted key, a message authentication code hash,
 and a selector, which must be the same used for encryption
 
 
