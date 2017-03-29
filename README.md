@@ -16,7 +16,6 @@ files and public keys present in DKIM DNS TXT records
 
 
 ## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
 * [func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error)](#Decrypt)
 * [func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error)](#DecryptSingle)
 * [func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error)](#Encrypt)
@@ -29,16 +28,6 @@ files and public keys present in DKIM DNS TXT records
 
 #### <a name="pkg-files">Package files</a>
 [crypt_decrypt.go](/src/dkimcrypt/crypt_decrypt.go) [privkey.go](/src/dkimcrypt/privkey.go) [pubkey.go](/src/dkimcrypt/pubkey.go) [sign_verify.go](/src/dkimcrypt/sign_verify.go) 
-
-
-## <a name="pkg-constants">Constants</a>
-``` go
-const (
-    KeySize = sha256.Size * 8
-    MacSize = sha256.Size
-)
-```
-KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
 
 
 ## <a name="Decrypt">func</a> [Decrypt](/../blob/master/crypt_decrypt.go?s=3094:3181#L116)

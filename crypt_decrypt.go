@@ -13,8 +13,8 @@ import (
 
 // KeySize and MacSize are the sizes in bits of the AES key and the Authentication Code, respectively
 const (
-	KeySize = sha256.Size * 8
-	MacSize = sha256.Size
+	keySize = sha256.Size * 8
+	macSize = sha256.Size
 )
 
 func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error) {
@@ -96,7 +96,7 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 // encrypted by EncryptSingle
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error) {
 
-	if len(in) < KeySize+MacSize {
+	if len(in) < keySize+macSize {
 		return nil, fmt.Errorf("Data length too short")
 	}
 
@@ -179,7 +179,7 @@ func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err erro
 
 // Make a 32 byte random key
 func makekey() (key []byte, err error) {
-	key = make([]byte, KeySize/8)
+	key = make([]byte, keySize/8)
 
 	if _, err = rand.Read(key); err != nil {
 		return nil, err
@@ -201,11 +201,11 @@ func constructcryptdata(crypt, key, mac []byte) (cryptdata []byte) {
 
 func deconstructcryptdata(cryptdata []byte) (data, key, mac []byte) {
 
-	data = make([]byte, len(cryptdata)-KeySize-MacSize)
-	key = make([]byte, KeySize)
-	mac = make([]byte, MacSize)
+	data = make([]byte, len(cryptdata)-keySize-macSize)
+	key = make([]byte, keySize)
+	mac = make([]byte, macSize)
 
-	mac, key, data = cryptdata[:MacSize], cryptdata[MacSize:MacSize+KeySize], cryptdata[MacSize+KeySize:]
+	mac, key, data = cryptdata[:macSize], cryptdata[macSize:macSize+keySize], cryptdata[macSize+keySize:]
 
 	return
 }
