@@ -9,6 +9,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -30,14 +31,14 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 	txt, err := net.LookupTXT(selector + "._domainkey." + domain)
 	if err != nil {
 		if strings.Contains(err.Error(), "no such host") {
-			return nil, fmt.Errorf("No key found for %s: %s", domain, err)
+			return nil, fmt.Errorf("no key found for %s: %s", domain, err)
 		}
-		return nil, fmt.Errorf("Service not available: %s", err)
+		return nil, fmt.Errorf("service not available: %s", err)
 	}
 
 	// empty record
 	if len(txt) == 0 {
-		return nil, fmt.Errorf("No key found for %s", domain)
+		return nil, fmt.Errorf("no key found for %s", domain)
 	}
 
 	pkr := new(pubKeyRep)
@@ -49,7 +50,7 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 	pkr.FlagIMustBeD = false
 
 	// parsing, we keep the first record
-	// TODO: if there is multiple record
+	// TODO: if there is multiple records
 
 	p := strings.Split(txt[0], ";")
 	for i, data := range p {
@@ -62,11 +63,11 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 		case "v":
 			// RFC: is this tag is specified it MUST be the first in the record
 			if i != 0 {
-				return nil, fmt.Errorf("Record syntax error: V tag must be first")
+				return nil, errors.New("record syntax error: V tag must be first")
 			}
 			pkr.Version = val
 			if pkr.Version != "DKIM1" {
-				return nil, fmt.Errorf("Version was not DKIM 1")
+				return nil, fmt.Errorf("version was %q, not DKIM1", pkr.Version)
 			}
 		case "h":
 			p := strings.Split(strings.ToLower(val), ":")
@@ -82,19 +83,19 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 				pkr.HashAlgo = []string{"sha1", "sha256"}
 			}
 		case "k":
-			if strings.ToLower(val) != "rsa" {
-				return nil, fmt.Errorf("Bad key type, must be 'rsa'")
+			if keytype := strings.ToLower(val); keytype != "rsa" {
+				return nil, fmt.Errorf("bad key type %q, must be 'rsa'", keytype)
 			}
 		case "n":
 			pkr.Note = val
 		case "p":
 			rawkey := val
 			if rawkey == "" {
-				return nil, fmt.Errorf("Key revoked")
+				return nil, errors.New("key revoked")
 			}
 			un64, err := base64.StdEncoding.DecodeString(rawkey)
 			if err != nil {
-				return nil, fmt.Errorf("Public key parse error")
+				return nil, fmt.Errorf("public key parse error: %s", err)
 			}
 			pk, err := x509.ParsePKIXPublicKey(un64)
 			pkr.PubKey = *pk.(*rsa.PublicKey)
@@ -125,14 +126,13 @@ func newPubKeyFromDNSTxt(selector, domain string) (*pubKeyRep, error) {
 
 	// if no pubkey
 	if pkr.PubKey == (rsa.PublicKey{}) {
-		return nil, fmt.Errorf("No public key found")
+		return nil, errors.New("no public key found")
 	}
 
 	return pkr, nil
 }
 
 func getPubKey(selector, hostname string) (*rsa.PublicKey, error) {
-
 	rep, err := newPubKeyFromDNSTxt(selector, hostname)
 
 	if err != nil {

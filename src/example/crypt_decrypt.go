@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"gitlab.one.com/go/dkimcrypt"
+	"github.com/adamhassel/dkimcrypt"
 )
 
 var (
@@ -63,11 +63,9 @@ Examples:
 		fmt.Fprintf(os.Stderr, "Must supply path to private key file for operation\n")
 		os.Exit(1)
 	}
-
 }
 
 func main() {
-
 	if len(*input) <= 0 {
 		fmt.Fprint(os.Stderr, "No data to process\n")
 		os.Exit(1)
@@ -113,7 +111,6 @@ func main() {
 }
 
 func GetData(input string) (out []byte) {
-
 	if input == "-" {
 		// read from STDIN
 		if o, err := ioutil.ReadAll(os.Stdin); err != nil {
@@ -150,7 +147,6 @@ func Encrypt(in []byte) (out []byte) {
 	}
 
 	return
-
 }
 
 func Decrypt(in []byte) (out []byte) {
@@ -169,11 +165,9 @@ func Decrypt(in []byte) (out []byte) {
 	}
 
 	return
-
 }
 
 func Sign(in []byte) (out []byte) {
-
 	var err error
 
 	if out, err = dkimcrypt.Sign(in, *privkeypath); err != nil {
@@ -186,11 +180,9 @@ func Sign(in []byte) (out []byte) {
 	}
 
 	return
-
 }
 
 func Verify(data []byte, sig []byte) bool {
-
 	var err error
 
 	if *b64 {
@@ -201,8 +193,8 @@ func Verify(data []byte, sig []byte) bool {
 	}
 
 	return dkimcrypt.Verify(data, sig, *selector, *domain) == nil
-
 }
+
 func b64encode(in []byte) (out []byte) {
 
 	out = make([]byte, base64.StdEncoding.EncodedLen(len(in)))
@@ -221,7 +213,6 @@ func b64decode(in []byte) (out []byte, e error) {
 	}
 
 	return out[:l], nil
-
 }
 
 // Check if exactly one element in b is true
@@ -245,5 +236,4 @@ func OneTrue(b ...bool) bool {
 	}
 
 	return f
-
 }

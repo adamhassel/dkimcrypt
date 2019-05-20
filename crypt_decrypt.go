@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
 )
@@ -21,34 +22,26 @@ func rsaDecrypt(selector, privkeypath string, in []byte) (out []byte, err error)
 	var privkey *rsa.PrivateKey
 
 	if privkey, err = getPrivKeyFromFile(privkeypath); err != nil {
-		return nil, fmt.Errorf("Couldn't read private key: %s", err)
+		return nil, fmt.Errorf("couldn't read private key: %s", err)
 	}
 
 	if out, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, in, []byte(selector)); err != nil {
-		return nil, fmt.Errorf("Decrypt: %s", err)
+		return nil, fmt.Errorf("decrypt: %s", err)
 	}
 
 	return out, nil
-
 }
 
 func rsaEncrypt(selector, domain string, in []byte) (out []byte, err error) {
-
 	var pubkey *rsa.PublicKey
 	if pubkey, err = getPubKey(selector, domain); err != nil {
 		return nil, err
 	}
 
-	if out, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey, in, []byte(selector)); err != nil {
-		return nil, err
-	}
-
-	return out, nil
-
+	return rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey, in, []byte(selector))
 }
 
 func aesDecrypt(key, ciphertext []byte) (plaintext []byte, err error) {
-
 	var block cipher.Block
 
 	if block, err = aes.NewCipher(key); err != nil {
@@ -56,7 +49,7 @@ func aesDecrypt(key, ciphertext []byte) (plaintext []byte, err error) {
 	}
 
 	if len(ciphertext) < aes.BlockSize {
-		return nil, fmt.Errorf("ciphertext too short")
+		return nil, errors.New("ciphertext too short")
 	}
 
 	iv := ciphertext[:aes.BlockSize]
@@ -71,7 +64,6 @@ func aesDecrypt(key, ciphertext []byte) (plaintext []byte, err error) {
 }
 
 func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
-
 	var block cipher.Block
 
 	if block, err = aes.NewCipher(key); err != nil {
@@ -80,7 +72,6 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 
 	ciphertext = make([]byte, aes.BlockSize+len(string(text)))
 
-	// iv =  initialization vector
 	iv := ciphertext[:aes.BlockSize]
 	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
 		return
@@ -95,7 +86,6 @@ func aesEncrypt(key, text []byte) (ciphertext []byte, err error) {
 // DecryptSingle is a wrapper around Decrypt, which will decrypt a byte slice
 // encrypted by EncryptSingle
 func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err error) {
-
 	if len(in) < keySize+macSize {
 		return nil, fmt.Errorf("Data length too short")
 	}
@@ -110,14 +100,12 @@ func DecryptSingle(selector, privkeypath string, in []byte) (out []byte, err err
 // the ecrypted data, useful for sending over a network. Decrypt using
 // DecryptSingle
 func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
-
 	var crypt, key, mac []byte
 
 	if crypt, key, mac, err = Encrypt(selector, domain, in); err == nil {
 		return constructcryptdata(crypt, key, mac), err
 	}
 	return nil, err
-
 }
 
 // Decrypt will decrypt the data in 'in' and return it in 'out', given the path
@@ -125,7 +113,6 @@ func EncryptSingle(selector, domain string, in []byte) (out []byte, err error) {
 // authentication code hash, and a selector, which must be the same used for
 // encryption
 func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err error) {
-
 	var uk []byte // unencrypted key
 
 	if uk, err = rsaDecrypt(selector, privkeypath, key); err != nil {
@@ -142,11 +129,10 @@ func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err
 	checkmac := hash.Sum(nil)
 
 	if !hmac.Equal(mac, checkmac) {
-		return nil, fmt.Errorf("Encrypted data could not be authenticated")
+		return nil, errors.New("encrypted data could not be authenticated")
 	}
 
 	return out, nil
-
 }
 
 // Encrypt will AES-encrypt the data given in 'in', and return the encrypted
@@ -154,7 +140,6 @@ func Decrypt(selector, privkeypath string, in, key, mac []byte) (out []byte, err
 // key it finds in the DKIM-like TXT record at [selector]._domainkey.[domain],
 // and a message authentication code hash.  Use the same selector in 'Decrypt'
 func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err error) {
-
 	var uk []byte // unencrypted, random 32-byte key
 	if uk, err = makekey(); err != nil {
 		return nil, nil, nil, err
@@ -174,7 +159,6 @@ func Encrypt(selector, domain string, in []byte) (out, key, mac []byte, err erro
 	mac = hash.Sum(nil)
 
 	return out, key, mac, nil
-
 }
 
 // Make a 32 byte random key
@@ -189,8 +173,7 @@ func makekey() (key []byte, err error) {
 }
 
 func constructcryptdata(crypt, key, mac []byte) (cryptdata []byte) {
-
-	cryptdata = make([]byte, 0)
+	cryptdata = make([]byte, 0, len(mac)+len(key)+len(crypt))
 
 	cryptdata = append(cryptdata, mac...)
 	cryptdata = append(cryptdata, key...)
